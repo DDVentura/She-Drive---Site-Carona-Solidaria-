@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>She Drive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .brand { font-family: 'Playfair Display', serif; font-style: italic; }
+
+    /* TELA DE ACESSO */
+    #tela-acesso { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fdf0f8 0%, #f3e8ff 100%); }
+    .acesso-container { width: 100%; max-width: 460px; padding: 20px; }
+    .acesso-logo { text-align: center; margin-bottom: 32px; }
+    .acesso-logo h1 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 3rem; color: var(--primary); margin: 0; }
+    .acesso-logo p { color: #888; font-size: 0.95rem; margin-top: 6px; }
+    .acesso-tabs { display: flex; background: #f0e8f8; border-radius: 999px; padding: 4px; margin-bottom: 28px; }
+    .acesso-tab { flex: 1; border: none; background: transparent; padding: 10px; border-radius: 999px; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: #888; transition: all 0.2s; }
+    .acesso-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(221,42,161,0.15); }
+    .acesso-form { display: none; }
+    .acesso-form.active { display: block; }
+    .tipo-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .tipo-btn { border: 2px solid var(--border); background: white; border-radius: 16px; padding: 16px 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .tipo-btn:hover { border-color: var(--secondary); }
+    .tipo-btn.selected { border-color: var(--primary); background: #fff0fb; }
+    .tipo-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .tipo-btn span { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--text); }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid #dcd4ec; background: #faf8ff; font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 4px rgba(240,178,199,0.2); }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-full { width: 100%; padding: 14px; border-radius: 999px; border: none; background: var(--primary); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 8px; font-family: 'DM Sans', sans-serif; }
+    .btn-full:hover { background: #c4208e; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(221,42,161,0.3); }
+    .campos-extras { display: none; }
+    .campos-extras.visible { display: block; }
+    .msg-erro { color: #d81b60; font-size: 0.88rem; margin-top: 8px; text-align: center; display: none; }
+    .msg-erro.visible { display: block; }
+
+    /* APP (pós-login) */
+    #tela-app { display: none; }
+    #tela-app.visible { display: block; }
+    header { background: var(--primary); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-brand { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.6rem; }
+    .header-usuario { font-size: 0.9rem; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 999px; }
+    .header-usuario span { font-weight: 600; }
+    nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    nav button { border: none; background: rgba(255,255,255,0.16); color: white; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: background 0.2s; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
+    nav button.active, nav button:hover { background: white; color: var(--primary); }
+    .btn-sair { background: rgba(255,255,255,0.1) !important; border: 1px solid rgba(255,255,255,0.3) !important; }
+    .btn-sair:hover { background: rgba(255,255,255,0.25) !important; color: white !important; }
+    main { padding: 32px 24px; max-width: 900px; margin: 0 auto; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .card { background: white; border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow); padding: 28px; margin-bottom: 24px; }
+    .card h2 { margin: 0 0 24px; font-family: 'Playfair Display', serif; color: var(--text); }
+    .card h3 { margin: 0 0 16px; color: var(--text); }
+    .btn-primary { background: var(--secondary); color: white; border: none; padding: 12px 24px; border-radius: 999px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(240,98,146,0.3); }
+    .btn-danger { background: transparent; border: 1px solid #f06292; color: #d81b60; padding: 8px 14px; border-radius: 999px; cursor: pointer; font-size: 0.88rem; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-danger:hover { background: #fff0f4; }
+    .perfil-badge { display: inline-block; background: #fff0fb; color: var(--primary); border: 1px solid #f9c6ea; padding: 4px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; margin-bottom: 20px; }
+    .history-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .history-item { border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; background: white; }
+    .history-item strong { display: block; margin-bottom: 4px; color: var(--primary); font-size: 0.95rem; }
+    .history-item p { margin: 0; color: #777; font-size: 0.88rem; }
+    .map-card { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: white; box-shadow: 0 8px 32px var(--shadow); }
+    .route-panel { padding: 20px; }
+    .route-panel h3 { margin: 0 0 16px; }
+    #map { width: 100%; height: 420px; }
+    .empty-state { text-align: center; padding: 40px; color: #aaa; font-size: 0.95rem; }
+    @media (max-width: 640px) {
+      .form-grid-2 { grid-template-columns: 1fr; }
+      nav { justify-content: center; }
+      #sobre .card-grid-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      #sobre [style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TELA DE ACESSO ===== -->
+<div id="tela-acesso">
+  <div class="acesso-container">
+    <div class="acesso-logo">
+      <h1>She Drive</h1>
+      <p>Um espaço seguro para caronas femininas</p>
+    </div>
+
+    <div class="acesso-card card">
+      <div class="acesso-tabs">
+        <button class="acesso-tab active" data-form="form-login">Entrar</button>
+        <button class="acesso-tab" data-form="form-cadastro">Cadastrar</button>
+      </div>
+
+      <!-- FORM LOGIN -->
+      <div id="form-login" class="acesso-form active">
+        <p style="font-weight:600; margin: 0 0 12px; font-size:0.95rem;">Entrar como:</p>
+        <div class="tipo-selector">
+          <button class="tipo-btn" id="login-tipo-motorista" onclick="selecionarTipoLogin('motorista')">
+            <span class="icon">🚗</span>
+            <span>Motorista</span>
+          </button>
+          <button class="tipo-btn" id="login-tipo-passageira" onclick="selecionarTipoLogin('passageira')">
+            <span class="icon">🙋‍♀️</span>
+            <span>Passageira</span>
+          </button>
+        </div>
+        <div class="form-field">
+          <label>E-mail</label>
+          <input id="login-email" type="email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-field">
+          <label>Senha</label>
+          <input id="login-senha" type="password" placeholder="••••••••" />
+        </div>
+        <div id="login-erro" class="msg-erro">E-mail ou senha inválidos.</div>
+        <button class="btn-full" onclick="fazerLogin()">Entrar</button>
+      </div>
+
+      <!-- FORM CADASTRO -->
+      <div id="form-cadastro" class="acesso-form">
+        <p style="font-weight:600; margin: 0 0 12px; font-size:0.95rem;">Quero me cadastrar como:</p>
+        <div class="tipo-selector">
+          <button class="tipo-btn" id="tipo-motorista" onclick="selecionarTipo('motorista')">
+            <span class="icon">🚗</span>
+            <span>Motorista</span>
+          </button>
+          <button class="tipo-btn" id="tipo-passageira" onclick="selecionarTipo('passageira')">
+            <span class="icon">🙋‍♀️</span>
+            <span>Passageira</span>
+          </button>
+        </div>
+
+        <div class="form-field">
+          <label>Nome completo</label>
+          <input id="cad-nome" type="text" placeholder="Seu nome" />
+        </div>
+        <div class="form-field">
+          <label>E-mail</label>
+          <input id="cad-email" type="email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-field">
+          <label>Telefone</label>
+          <input id="cad-telefone" type="tel" placeholder="(11) 99999-9999" />
+        </div>
+        <div class="form-field">
+          <label>Senha</label>
+          <input id="cad-senha" type="password" placeholder="Crie uma senha" />
+        </div>
+
+        <!-- Campos extras motorista -->
+        <div id="campos-motorista" class="campos-extras">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Modelo do carro</label>
+              <input id="cad-carro" type="text" placeholder="Ex: HB20, Onix" />
+            </div>
+            <div class="form-field">
+              <label>Vagas disponíveis</label>
+              <select id="cad-vagas">
+                <option value="">Selecione</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Rotas principais</label>
+            <input id="cad-rotas" type="text" placeholder="Ex: Centro → Zona Sul" />
+          </div>
+          <div class="form-field">
+            <label>Sobre você</label>
+            <textarea id="cad-obs" rows="3" placeholder="Descreva seu perfil..."></textarea>
+          </div>
+        </div>
+
+        <!-- Campos extras passageira -->
+        <div id="campos-passageira" class="campos-extras">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Origem</label>
+              <input id="cad-origem" type="text" placeholder="Ex: Rua das Flores, 100" />
+            </div>
+            <div class="form-field">
+              <label>Destino</label>
+              <input id="cad-destino" type="text" placeholder="Ex: Shopping, bairro" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Preferências</label>
+            <textarea id="cad-prefs" rows="3" placeholder="Ex: carona feminina, trajeto rápido..."></textarea>
+          </div>
+        </div>
+
+        <div id="cad-erro" class="msg-erro">Preencha todos os campos obrigatórios.</div>
+        <button class="btn-full" onclick="fazerCadastro()">Criar conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TELA DO APP ===== -->
+<div id="tela-app">
+  <header>
+    <div class="header-left">
+      <div class="header-brand">She Drive</div>
+      <div class="header-usuario">Olá, <span id="header-nome">—</span> · <span id="header-tipo">—</span></div>
+    </div>
+    <nav>
+      <button class="tab-button active" data-tab="perfil">Meu Perfil</button>
+      <button class="tab-button" data-tab="historico">Histórico</button>
+      <button class="tab-button" data-tab="trajetos">Trajetos</button>
+      <button class="tab-button" data-tab="sobre">Sobre</button>
+      <button class="tab-button btn-sair" onclick="sair()">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- PERFIL -->
+    <div id="perfil" class="tab-panel active">
+      <div class="card">
+        <h2>Meu Perfil</h2>
+        <div id="perfil-badge" class="perfil-badge"></div>
+        <div id="perfil-form"></div>
+        <button class="btn-primary" onclick="salvarPerfil()">Salvar alterações</button>
+        <div id="perfil-msg" style="margin-top:12px; font-size:0.9rem; color:#4caf50; display:none;">✓ Salvo com sucesso!</div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div id="historico" class="tab-panel">
+      <div class="card">
+        <h2>Histórico de trajetos</h2>
+        <ul id="historico-list" class="history-list"></ul>
+      </div>
+    </div>
+
+    <!-- TRAJETOS -->
+    <div id="trajetos" class="tab-panel">
+      <div class="card">
+        <h2>Traçar trajeto</h2>
+        <div class="map-card">
+          <div class="route-panel">
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label>Origem</label>
+                <input id="start" type="text" placeholder="Digite a origem" />
+              </div>
+              <div class="form-field">
+                <label>Destino</label>
+                <input id="end" type="text" placeholder="Digite o destino" />
+              </div>
+            </div>
+            <button class="btn-primary" id="routeButton" type="button">Traçar rota</button>
+          </div>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+    <!-- SOBRE -->
+    <div id="sobre" class="tab-panel">
+      <div class="card" style="text-align:center; padding: 48px 32px;">
+        <div style="font-size:3.5rem; margin-bottom:16px;">🚗💜</div>
+        <h2 style="font-family:'Playfair Display',serif; font-size:2.2rem; margin:0 0 12px;">She Drive</h2>
+        <p style="font-size:1.1rem; color:#888; margin:0 0 40px;">Um espaço seguro para caronas 100% femininas.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.4rem;">Nossa missão</h3>
+        <p style="line-height:1.8; color:#555;">O She Drive nasceu da necessidade de criar um ambiente de mobilidade urbana seguro, acolhedor e exclusivo para mulheres. Acreditamos que toda mulher merece se locomover com tranquilidade, sabendo que tanto a motorista quanto a passageira compartilham dos mesmos valores de respeito e segurança.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:24px;">
+        <div class="card" style="text-align:center; padding:28px 20px;">
+          <div style="font-size:2.2rem; margin-bottom:12px;">🔒</div>
+          <h4 style="margin:0 0 8px; color:var(--primary);">Segurança</h4>
+          <p style="font-size:0.9rem; color:#777; margin:0; line-height:1.6;">Perfis verificados e ambiente exclusivamente feminino em todas as etapas.</p>
+        </div>
+        <div class="card" style="text-align:center; padding:28px 20px;">
+          <div style="font-size:2.2rem; margin-bottom:12px;">🤝</div>
+          <h4 style="margin:0 0 8px; color:var(--primary);">Comunidade</h4>
+          <p style="font-size:0.9rem; color:#777; margin:0; line-height:1.6;">Conectamos mulheres que se ajudam no dia a dia, criando redes de confiança.</p>
+        </div>
+        <div class="card" style="text-align:center; padding:28px 20px;">
+          <div style="font-size:2.2rem; margin-bottom:12px;">🗺️</div>
+          <h4 style="margin:0 0 8px; color:var(--primary);">Mobilidade</h4>
+          <p style="font-size:0.9rem; color:#777; margin:0; line-height:1.6;">Trajetos inteligentes com mapa integrado para facilitar sua rotina.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.4rem;">Como funciona</h3>
+        <div style="display:grid; gap:16px; margin-top:8px;">
+          <div style="display:flex; align-items:flex-start; gap:16px;">
+            <div style="background:var(--primary); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">1</div>
+            <div><strong>Crie sua conta</strong><p style="margin:4px 0 0; color:#777; font-size:0.9rem;">Cadastre-se como motorista ou passageira com seus dados e preferências.</p></div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:16px;">
+            <div style="background:var(--primary); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">2</div>
+            <div><strong>Faça login</strong><p style="margin:4px 0 0; color:#777; font-size:0.9rem;">Acesse sua conta e gerencie seu perfil a qualquer momento.</p></div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:16px;">
+            <div style="background:var(--primary); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">3</div>
+            <div><strong>Trace seus trajetos</strong><p style="margin:4px 0 0; color:#777; font-size:0.9rem;">Use o mapa integrado para planejar suas rotas e acompanhar seu histórico.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background: linear-gradient(135deg, #fff0fb, #f3e8ff); border-color: #f9c6ea; text-align:center; padding:36px;">
+        <p style="font-size:1.1rem; font-style:italic; color:var(--primary); margin:0; line-height:1.8;">"Segurança não é um privilégio — é um direito. O She Drive existe para garantir que cada mulher chegue ao seu destino com tranquilidade."</p>
+        <p style="margin:16px 0 0; font-size:0.88rem; color:#aaa;">— Equipe She Drive</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let usuarioLogado = null;
+
+  // ===== TABS DE ACESSO =====
+  document.querySelectorAll('.acesso-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.acesso-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.acesso-form').forEach(f => f.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.form).classList.add('active');
+    });
+  });
+
+  // ===== TABS DO APP =====
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    if (btn.dataset.tab) {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'historico') carregarHistorico();
+      });
+    }
+  });
+
+  // ===== TIPO DE CADASTRO =====
+  let tipoSelecionado = null;
+  let tipoLoginSelecionado = null;
+
+  function selecionarTipoLogin(tipo) {
+    tipoLoginSelecionado = tipo;
+    document.getElementById('login-tipo-motorista').classList.toggle('selected', tipo === 'motorista');
+    document.getElementById('login-tipo-passageira').classList.toggle('selected', tipo === 'passageira');
+  }
+
+  function selecionarTipo(tipo) {
+    tipoSelecionado = tipo;
+    document.getElementById('tipo-motorista').classList.toggle('selected', tipo === 'motorista');
+    document.getElementById('tipo-passageira').classList.toggle('selected', tipo === 'passageira');
+    document.getElementById('campos-motorista').classList.toggle('visible', tipo === 'motorista');
+    document.getElementById('campos-passageira').classList.toggle('visible', tipo === 'passageira');
+  }
+
+  // ===== LOGIN =====
+  async function fazerLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-senha').value;
+    const erro = document.getElementById('login-erro');
+    erro.classList.remove('visible');
+
+    if (!tipoLoginSelecionado) { erro.textContent = 'Selecione se vai entrar como motorista ou passageira.'; erro.classList.add('visible'); return; }
+    if (!email || !senha) { erro.textContent = 'Preencha e-mail e senha.'; erro.classList.add('visible'); return; }
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: senha, tipo: tipoLoginSelecionado })
+      });
+      const data = await res.json();
+      if (!res.ok) { erro.textContent = data.erro || 'E-mail ou senha inválidos.'; erro.classList.add('visible'); return; }
+      entrarNoApp(data.usuario, data.tipo);
+    } catch (e) {
+      erro.textContent = 'Erro ao conectar com o servidor.'; erro.classList.add('visible');
+    }
+  }
+
+  // ===== CADASTRO =====
+  async function fazerCadastro() {
+    const erro = document.getElementById('cad-erro');
+    erro.classList.remove('visible');
+
+    if (!tipoSelecionado) { erro.textContent = 'Selecione o tipo de cadastro.'; erro.classList.add('visible'); return; }
+
+    const nome = document.getElementById('cad-nome').value.trim();
+    const email = document.getElementById('cad-email').value.trim();
+    const telefone = document.getElementById('cad-telefone').value.trim();
+    const senha = document.getElementById('cad-senha').value;
+
+    if (!nome || !email || !telefone || !senha) { erro.textContent = 'Preencha todos os campos obrigatórios.'; erro.classList.add('visible'); return; }
+
+    let payload = { name: nome, email, telefone, phone: telefone, senha, password: senha };
+    let rota = '';
+
+    if (tipoSelecionado === 'motorista') {
+      const carro = document.getElementById('cad-carro').value.trim();
+      const vagas = document.getElementById('cad-vagas').value;
+      const rotas = document.getElementById('cad-rotas').value.trim();
+      if (!carro || !vagas) { erro.textContent = 'Preencha os dados do carro.'; erro.classList.add('visible'); return; }
+      payload = { ...payload, car: carro, seats: vagas, route: rotas, comments: document.getElementById('cad-obs').value };
+      rota = '/motoristas';
+    } else {
+      const origem = document.getElementById('cad-origem').value.trim();
+      const destino = document.getElementById('cad-destino').value.trim();
+      if (!origem || !destino) { erro.textContent = 'Preencha origem e destino.'; erro.classList.add('visible'); return; }
+      payload = { ...payload, origin: origem, destination: destino, preferences: document.getElementById('cad-prefs').value };
+      rota = '/passageiras';
+    }
+
+    try {
+      const res = await fetch(`${API}${rota}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) { erro.textContent = data.erro || 'Erro ao cadastrar.'; erro.classList.add('visible'); return; }
+      const obj = data.motorista || data.passageira;
+      entrarNoApp(obj, tipoSelecionado);
+    } catch (e) {
+      erro.textContent = 'Erro ao conectar com o servidor.'; erro.classList.add('visible');
+    }
+  }
+
+  // ===== ENTRAR NO APP =====
+  function entrarNoApp(usuario, tipo) {
+    usuarioLogado = { ...usuario, tipo };
+    document.getElementById('tela-acesso').style.display = 'none';
+    document.getElementById('tela-app').classList.add('visible');
+    document.getElementById('header-nome').textContent = usuario.nome || usuario.name || '';
+    document.getElementById('header-tipo').textContent = tipo === 'motorista' ? '🚗 Motorista' : '🙋‍♀️ Passageira';
+    renderizarPerfil();
+  }
+
+  // ===== SAIR =====
+  function sair() {
+    usuarioLogado = null;
+    document.getElementById('tela-app').classList.remove('visible');
+    document.getElementById('tela-acesso').style.display = 'flex';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+  }
+
+  // ===== PERFIL =====
+  function renderizarPerfil() {
+    const u = usuarioLogado;
+    const badge = document.getElementById('perfil-badge');
+    badge.textContent = u.tipo === 'motorista' ? '🚗 Motorista' : '🙋‍♀️ Passageira';
+
+    let html = `
+      <div class="form-grid-2">
+        <div class="form-field"><label>Nome</label><input id="p-nome" value="${u.nome || u.name || ''}" /></div>
+        <div class="form-field"><label>Telefone</label><input id="p-telefone" value="${u.telefone || u.phone || ''}" /></div>
+      </div>`;
+
+    if (u.tipo === 'motorista') {
+      html += `
+      <div class="form-grid-2">
+        <div class="form-field"><label>Carro</label><input id="p-carro" value="${u.carro || u.car || ''}" /></div>
+        <div class="form-field"><label>Vagas</label>
+          <select id="p-vagas">
+            ${[1,2,3,4].map(n => `<option ${(u.vagas||u.seats)==n?'selected':''}>${n}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-field"><label>Rotas principais</label><input id="p-rotas" value="${u.rotas || u.route || ''}" /></div>
+      <div class="form-field"><label>Sobre você</label><textarea id="p-obs" rows="3">${u.observacoes || u.comments || ''}</textarea></div>`;
+    } else {
+      html += `
+      <div class="form-grid-2">
+        <div class="form-field"><label>Origem</label><input id="p-origem" value="${u.origem || u.origin || ''}" /></div>
+        <div class="form-field"><label>Destino</label><input id="p-destino" value="${u.destino || u.destination || ''}" /></div>
+      </div>
+      <div class="form-field"><label>Preferências</label><textarea id="p-prefs" rows="3">${u.preferencias || u.preferences || ''}</textarea></div>`;
+    }
+
+    document.getElementById('perfil-form').innerHTML = html;
+  }
+
+  async function salvarPerfil() {
+    const id = usuarioLogado._id;
+    const tipo = usuarioLogado.tipo;
+    let payload = {
+      name: document.getElementById('p-nome').value,
+      phone: document.getElementById('p-telefone').value,
+    };
+
+    if (tipo === 'motorista') {
+      payload = { ...payload, car: document.getElementById('p-carro').value, seats: document.getElementById('p-vagas').value, route: document.getElementById('p-rotas').value, comments: document.getElementById('p-obs').value };
+    } else {
+      payload = { ...payload, origin: document.getElementById('p-origem').value, destination: document.getElementById('p-destino').value, preferences: document.getElementById('p-prefs').value };
+    }
+
+    const rota = tipo === 'motorista' ? 'motoristas' : 'passageiras';
+    const res = await fetch(`${API}/${rota}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const msg = document.getElementById('perfil-msg');
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 3000);
+    }
+  }
+
+  // ===== HISTÓRICO =====
+  async function carregarHistorico() {
+    const lista = document.getElementById('historico-list');
+    lista.innerHTML = '<li class="history-item"><em>Carregando...</em></li>';
+    const res = await fetch(`${API}/history`);
+    const data = await res.json();
+    if (!data.length) { lista.innerHTML = '<li class="empty-state">Nenhuma rota registrada ainda.</li>'; return; }
+    lista.innerHTML = data.map(h => `
+      <li class="history-item">
+        <strong>${h.origin} ➜ ${h.destination}</strong>
+        <p>Data: ${h.date}</p>
+      </li>`).join('');
+  }
+
+  // ===== MAPA =====
+  let map, directionsService, directionsRenderer;
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: -23.55052, lng: -46.633308 },
+      zoom: 12,
+      styles: [
+        { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+      ]
+    });
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({ map, polylineOptions: { strokeColor: '#dd2aa1', strokeWeight: 6 } });
+  }
+
+  document.getElementById('routeButton').addEventListener('click', async () => {
+    const origin = document.getElementById('start').value;
+    const destination = document.getElementById('end').value;
+    if (!origin || !destination) { alert('Informe origem e destino.'); return; }
+    directionsService.route({ origin, destination, travelMode: google.maps.TravelMode.DRIVING }, async (response, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(response);
+        await fetch(`${API}/history`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ origin, destination, date: new Date().toLocaleDateString('pt-BR') })
+        });
+      } else {
+        alert('Não foi possível traçar a rota: ' + status);
+      }
+    });
+  });
+
+  window.initMap = initMap;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ_mdL2qKCqlcZ-c0GceZUnn7_mguNR5I&callback=initMap" async defer></script>
+</body>
+</html>
